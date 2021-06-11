@@ -7,6 +7,15 @@ import mercantile
 import os
 import pickle
 
+"""
+TODO
+
+- OOP
+- Connect to cli.py
+- Add city_key to output
+
+"""
+
 def main():
     load_dotenv()
     DATA_PATH = 'data/cities/'
