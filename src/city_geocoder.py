@@ -39,22 +39,25 @@ def read_data(file:str, top_n:int, region:str) -> list:
                 break
     return queries
 
-def geocode(queries, tile_rng:list, api_key:str) -> dict:
+def geocode(queries:list, tile_rng:list, api_key:str) -> dict:
     city_tile_pairs = {}
     for q in queries:
         print(q)
         g = geocoder.google(f'metropolitan, {q}', key = api_key)
-        wsen = [g.json['bbox']['southwest'][1],
-                g.json['bbox']['southwest'][0],
-                g.json['bbox']['northeast'][1],
-                g.json['bbox']['northeast'][0]]
-        tiles = mercantile.tiles(wsen[0],
-                                 wsen[1],
-                                 wsen[2],
-                                 wsen[3],
-                                 tile_rng)
-        city_tile_pairs[q] = tiles
+        city_tile_pairs[q] = tiles_from_bbox(g)
     return city_tile_pairs
+
+def tiles_from_bbox(g:dict) -> list:
+    wsen = [g.json['bbox']['southwest'][1],
+            g.json['bbox']['southwest'][0],
+            g.json['bbox']['northeast'][1],
+            g.json['bbox']['northeast'][0]]
+    tiles = mercantile.tiles(wsen[0],
+                             wsen[1],
+                             wsen[2],
+                             wsen[3],
+                             tile_rng)
+    return tiles
 
 def iter_tiles(city_tile_pairs:dict) -> dict:
     tile_tree = {}
