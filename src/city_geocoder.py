@@ -13,6 +13,7 @@ TODO
 - OOP
 - Connect to cli.py
 - Add city_key to output
+- Dynamic filepaths from CLI
 
 """
 

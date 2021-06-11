@@ -8,8 +8,9 @@ load_dotenv()
 
 """
 TODO:
-Add arguments for filename & outpath
-Add command for geocoding
+- Add arguments for filename & outpath
+- Add command for geocoding
+- Add help 
 
 """
 
