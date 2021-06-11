@@ -21,7 +21,7 @@ def main():
     json.dump(us_tile_tree, open(f'{DATA_PATH}us_tile_tree.json', 'w'))
     json.dump(can_tile_tree, open(f'{DATA_PATH}can_tile_tree.json', 'w'))
 
-def read_data(file:str, top_n:int, region:str):
+def read_data(file:str, top_n:int, region:str) -> list:
     queries = []
     with open(f'{file}', newline='') as f:
         reader = csv.DictReader(f, delimiter=',')
@@ -39,7 +39,7 @@ def read_data(file:str, top_n:int, region:str):
                 break
     return queries
 
-def geocode(queries, tile_rng:list, api_key:str):
+def geocode(queries, tile_rng:list, api_key:str) -> dict:
     city_tile_pairs = {}
     for q in queries:
         print(q)
@@ -56,7 +56,7 @@ def geocode(queries, tile_rng:list, api_key:str):
         city_tile_pairs[q] = tiles
     return city_tile_pairs
 
-def iter_tiles(city_tile_pairs):
+def iter_tiles(city_tile_pairs:dict) -> dict:
     tile_tree = {}
     for k in city_tile_pairs.keys():
         tiles = city_tile_pairs[k]
