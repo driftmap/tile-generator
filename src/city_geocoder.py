@@ -12,6 +12,7 @@ TODO
 
 - Add city_key to output
 - Dynamic filepaths from CLI
+- Threading
 
 """
 

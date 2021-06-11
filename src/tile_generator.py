@@ -14,7 +14,8 @@ Create function which takes a CSV of city_strings and maps generate_tiles to eac
 """
 
 
-"""Timing Improvement Notes:
+"""
+Timing Improvement Notes:
 Original Fetch Time:
 Fetching tiles for atlanta took 335.68190026283264  sec to run
 Fetching tiles for atlanta took 352.68857431411743  sec to run
