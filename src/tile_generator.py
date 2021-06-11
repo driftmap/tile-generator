@@ -1,6 +1,5 @@
 from dotenv import load_dotenv
 
-import click
 import json
 import os
 from functools import wraps
