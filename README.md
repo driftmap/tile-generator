@@ -8,17 +8,21 @@ CLI tool for:
 
 Current CLI commands:
 
-Geocoding:
+1. Geocoding:
+
+Mandatory --region flag, with "us" and "can" as options.
+
 ```bash
-python cli.py gentiletree
+python cli.py gentiletree --region us
 ```
 
-Generate tiles:
+2. Generate tiles:
+
 ```bash
 python cli.py gentiles
 ```
 
-For command flags, type:
+For more command flags, type:
 
 ```bash
 python cli.py [COMMAND] --help

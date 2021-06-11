@@ -13,7 +13,6 @@ Create an abreviation generation function for similarly named cities, eg citynam
 Create function which takes a CSV of city_strings and maps generate_tiles to each city for mass dling
 """
 
-
 """
 Timing Improvement Notes:
 Original Fetch Time:
