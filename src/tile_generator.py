@@ -27,7 +27,7 @@ Cleaned up Fetch time after threaded:
 """
 
 class TileGenerator():
-    def __init__(self, OMT: str, city_key: str, city_string: str, filename: str, outpath) -> None:
+    def __init__(self, OMT:str, city_key:str, city_string:str, filename:str, outpath:str) -> None:
         self.OMT = OMT
         self.city = city_key
         self.city_abrev = city_string
