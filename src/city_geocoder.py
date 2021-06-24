@@ -13,7 +13,6 @@ TODO
 
 - Add city_key to output
 - Dynamic filepaths from CLI
-- Threading
 
 """
 
@@ -26,7 +25,7 @@ class Geocoder():
         self.top_n = top_n
         self.outpath = outpath
 
-    def geocode(self):
+    def geocode(self) -> None:
         queries = self._read_data()
         self._process_queries(queries)
         tile_tree = self._iter_tiles()
@@ -64,7 +63,7 @@ class Geocoder():
                 except Exception as e:
                     print(e)
 
-    def _geocode(self, q):
+    def _geocode(self, q:list) -> str:
         g = geocoder.google(f'metropolitan, {q}', key = self.API_KEY)
         self.city_tile_pairs[q] = self._tiles_from_bbox(g)
         msg = f"Finished geocoding city: {q}"
