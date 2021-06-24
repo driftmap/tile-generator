@@ -9,7 +9,6 @@ from concurrent.futures import ThreadPoolExecutor
 
 """
 TODO:
-Create an abreviation generation function for similarly named cities, eg cityname+State+county string
 Create function which takes a CSV of city_strings and maps generate_tiles to each city for mass dling
 """
 
@@ -27,10 +26,10 @@ Cleaned up Fetch time after threaded:
 """
 
 class TileGenerator():
-    def __init__(self, OMT:str, city_key:str, city_string:str, filename:str, outpath:str) -> None:
+    def __init__(self, OMT:str, city_key:str, filename:str, outpath:str) -> None:
         self.OMT = OMT
         self.city = city_key
-        self.city_abrev = city_string
+        #self.city_abrev = city_string
         self.filename = filename
         self.outpath = outpath
 
@@ -48,18 +47,18 @@ class TileGenerator():
     def generate_tiles(self) -> None:
         tile_tree_dict = json.load(open(f'{self.filename}', 'rb'))
         self.tile_list = []
-        if not os.path.isdir(f"{self.outpath}{self.city_abrev}"):
-            os.mkdir(f"{self.outpath}{self.city_abrev}")
-        for zoom, v in tile_tree_dict[self.city_abrev].items():
-            if not os.path.isdir(f"{self.outpath}{self.city_abrev}/{zoom}"):
-                os.mkdir(f"{self.outpath}{self.city_abrev}/{zoom}")
+        if not os.path.isdir(f"{self.outpath}{self.city}"):
+            os.mkdir(f"{self.outpath}{self.city}")
+        for zoom, v in tile_tree_dict[self.city].items():
+            if not os.path.isdir(f"{self.outpath}{self.city}/{zoom}"):
+                os.mkdir(f"{self.outpath}{self.city}/{zoom}")
             for tile_nr in v:
                 x = tile_nr[0]
                 y = tile_nr[1]
                 url = f"{self.OMT}{zoom}/{x}/{y}.pbf"
-                file = f"{self.outpath}{self.city_abrev}/{zoom}/{x}/{y}.pbf"
-                if not os.path.isdir(f"{self.outpath}{self.city_abrev}/{zoom}/{x}"):
-                    os.mkdir(f"{self.outpath}{self.city_abrev}/{zoom}/{x}")
+                file = f"{self.outpath}{self.city}/{zoom}/{x}/{y}.pbf"
+                if not os.path.isdir(f"{self.outpath}{self.city}/{zoom}/{x}"):
+                    os.mkdir(f"{self.outpath}{self.city}/{zoom}/{x}")
                 self.tile_list.append(tuple((url, file)))
         self._download_tile_list()
 

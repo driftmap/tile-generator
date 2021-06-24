@@ -8,14 +8,6 @@ import mercantile
 import os
 import pickle
 
-"""
-TODO
-
-- Add city_key to output
-- Dynamic filepaths from CLI
-
-"""
-
 class Geocoder():
     def __init__(self, API_KEY:str, region:str, file:str, z_low:int, z_high:int, top_n:int, outpath:str) -> None:
         self.API_KEY = API_KEY
@@ -40,11 +32,17 @@ class Geocoder():
                     city = row['city']
                     state = row['state_name']
                     county = row['county_name']
-                    queries.append(f'{city}, {county} County, {state}, United States')
+                    county_fips = row['county_fips']
+                    city_key = self._create_city_key(city, county_fips)
+                    print(city_key)
+                    queries.append((f'{city}, {county} County, {state}, United States', city_key))
                 elif self.region == 'can':
                     city = row['city']
                     province = row['province_name']
-                    queries.append(f'{city}, {province}, Canada')
+                    province_id = row['province_id']
+                    city_key = self._create_city_key(city, province_id)
+                    print(city_key)
+                    queries.append((f'{city}, {province}, Canada', city_key))
                 if(i >= self.top_n):
                     break
         return queries
@@ -64,9 +62,9 @@ class Geocoder():
                     print(e)
 
     def _geocode(self, q:list) -> str:
-        g = geocoder.google(f'metropolitan, {q}', key = self.API_KEY)
-        self.city_tile_pairs[q] = self._tiles_from_bbox(g)
-        msg = f"Finished geocoding city: {q}"
+        g = geocoder.google(f'metropolitan, {q[0]}', key = self.API_KEY)
+        self.city_tile_pairs[q[1]] = self._tiles_from_bbox(g)
+        msg = f"Finished geocoding city: {q[0]}"
         return msg
 
     def _tiles_from_bbox(self, g:dict) -> list:
@@ -93,3 +91,7 @@ class Geocoder():
                 else:
                     tile_tree[k][tile.z].append((tile.x, tile.y))
         return tile_tree
+
+    def _create_city_key(self, city:str, id:str) -> str:
+        city_key = f'{city.replace(" ", "_")}_{id}'.lower()
+        return city_key
