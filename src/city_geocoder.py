@@ -1,3 +1,4 @@
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from dotenv import load_dotenv
 
 import csv
@@ -27,8 +28,8 @@ class Geocoder():
 
     def geocode(self):
         queries = self._read_data()
-        city_tile_pairs = self._geocode(queries)
-        tile_tree = self._iter_tiles(city_tile_pairs)
+        self._process_queries(queries)
+        tile_tree = self._iter_tiles()
         json.dump(tile_tree, open(f'{self.outpath}', 'w'))
 
     def _read_data(self) -> list:
@@ -49,13 +50,25 @@ class Geocoder():
                     break
         return queries
 
-    def _geocode(self, queries:list) -> dict:
-        city_tile_pairs = {}
-        for q in queries:
-            print(q)
-            g = geocoder.google(f'metropolitan, {q}', key = self.API_KEY)
-            city_tile_pairs[q] = self._tiles_from_bbox(g)
-        return city_tile_pairs
+    def _process_queries(self, queries:list) -> None:
+        self.city_tile_pairs = {}
+        futures = []
+        with ThreadPoolExecutor(max_workers=15) as executor:
+            for q in queries:
+                future = executor.submit(self._geocode, q)
+                futures.append(future)
+
+            for future in futures:
+                try:
+                    print(future.result())
+                except Exception as e:
+                    print(e)
+
+    def _geocode(self, q):
+        g = geocoder.google(f'metropolitan, {q}', key = self.API_KEY)
+        self.city_tile_pairs[q] = self._tiles_from_bbox(g)
+        msg = f"Finished geocoding city: {q}"
+        return msg
 
     def _tiles_from_bbox(self, g:dict) -> list:
         wsen = [g.json['bbox']['southwest'][1],
@@ -69,10 +82,10 @@ class Geocoder():
                                  self.rng)
         return tiles
 
-    def _iter_tiles(self, city_tile_pairs:dict) -> dict:
+    def _iter_tiles(self) -> dict:
         tile_tree = {}
-        for k in city_tile_pairs.keys():
-            tiles = city_tile_pairs[k]
+        for k in self.city_tile_pairs.keys():
+            tiles = self.city_tile_pairs[k]
             tile_tree[k] = {}
             for tile in tiles:
                 if tile.z not in tile_tree[k]:
