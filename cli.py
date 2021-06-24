@@ -15,6 +15,12 @@ TODO:
 
 """
 
+city_key_help = """
+City key to generate tiles for. Write city in lower case and connect with identifier using underscore.\n
+For US cities, identifier is county FIPS number. For example, atlanta_13121.\n
+For Canadian cities, identifier is province abbrevation. For example, montreal_QC.\n
+"""
+
 @click.group()
 def main() -> None:
     pass
@@ -34,7 +40,7 @@ def gentiletree(region:str, top_n:int, z_low:int, z_high:int, data_path:str) -> 
     gc.geocode()
 
 @click.command()
-@click.option("--city_key", default="atlanta_13121", help="City key to generate tiles for.")
+@click.option("--city_key", default="atlanta_13121", help=city_key_help)
 def gentiles(city_key:str) -> None:
     click.echo(f'Launching tilegenerator for city key "{city_key}."')
     OMT = os.environ.get("OMT_URL")
