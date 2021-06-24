@@ -9,7 +9,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 """
 TODO:
-Create function which takes a CSV of city_strings and maps generate_tiles to each city for mass dling
+Create function which takes a CSV of city_keys and maps generate_tiles to each city for mass dling
 """
 
 """
