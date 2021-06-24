@@ -44,7 +44,6 @@ def gentiletree(region:str, top_n:int, z_low:int, z_high:int, data_path:str) -> 
 def gentiles(city_key:str) -> None:
     click.echo(f'Launching tilegenerator for city key "{city_key}."')
     OMT = os.environ.get("OMT_URL")
-    #city_name = "Atlanta, Fulton County, Georgia, United States"
     filename = str(os.environ.get("DATA_PATH_CITY")) + "us_tile_tree.json"
     outpath = "data/tiles/"
     tg = TileGenerator(OMT,city_key,filename,outpath)
