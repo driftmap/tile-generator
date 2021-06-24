@@ -5,7 +5,7 @@ import os
 from functools import wraps
 import time
 import urllib.request
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import ThreadPoolExecutor
 
 """
 TODO:
