@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 import json
 import os
 from functools import wraps
+import requests
 import time
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor
@@ -76,7 +77,7 @@ class TileGenerator():
                     print(e)
 
     def _download_tile(self, url:tuple) -> str:
-        urllib.request.urlretrieve(url[0], url[1])
+        open(f'{url[1]}', 'wb').write(requests.get(url[0]).content)
         msg = f"Finished downloading tile: {url[0]}"
         return msg
 
