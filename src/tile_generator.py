@@ -5,7 +5,6 @@ import os
 from functools import wraps
 import requests
 import time
-import urllib.request
 from concurrent.futures import ThreadPoolExecutor
 
 """
