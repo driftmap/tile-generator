@@ -40,11 +40,12 @@ def gentiletree(region:str, top_n:int, z_low:int, z_high:int, data_path:str) -> 
     gc.geocode()
 
 @click.command()
+@click.option("--region", type=click.Choice(['us', 'can']), required=True, help="Region to geocode.")
 @click.option("--city_key", default="atlanta_13121", help=city_key_help)
-def gentiles(city_key:str) -> None:
+def gentiles(city_key:str, region:str) -> None:
     click.echo(f'Launching tilegenerator for city key "{city_key}."')
     OMT = os.environ.get("OMT_URL")
-    filename = str(os.environ.get("DATA_PATH_CITY")) + "us_tile_tree.json"
+    filename = str(os.environ.get("DATA_PATH_CITY")) + f"{region}_tile_tree.json"
     outpath = "data/tiles/"
     tg = TileGenerator(OMT,city_key,filename,outpath)
     tg.generate_tiles()
