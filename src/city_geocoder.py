@@ -22,7 +22,7 @@ class Geocoder():
         self._process_queries(queries)
         tile_tree = self._iter_tiles()
         json.dump(tile_tree, open(f'{self.outpath}_tile_tree.json', 'w'))
-        json.dump(self.region_meta, open(f'{self.outpath}_meta', 'w'))
+        #json.dump(self.region_meta, open(f'{self.outpath}_meta', 'w'))
 
     def _read_data(self) -> list:
         queries = []
@@ -50,7 +50,6 @@ class Geocoder():
 
     def _process_queries(self, queries:list) -> None:
         self.city_tile_pairs = {}
-        self.region_meta = {}
         futures = []
         with ThreadPoolExecutor(max_workers=15) as executor:
             for q in queries:
@@ -65,36 +64,41 @@ class Geocoder():
 
     def _geocode(self, q:list) -> str:
         g = geocoder.google(f'{q[0]}', key = self.API_KEY)
-        self._tiles_from_bbox(g, q[1])
+        self._tiles_from_bbox(g, q[0], q[1])
         msg = f"Finished geocoding city: {q[0]}"
         return msg
 
-    def _tiles_from_bbox(self, g:dict,q:str):
+    def _tiles_from_bbox(self, g:dict,name:str,key:str):
         wsen = [g.json['bbox']['southwest'][1],
                 g.json['bbox']['southwest'][0],
                 g.json['bbox']['northeast'][1],
                 g.json['bbox']['northeast'][0]]
-        centroid = ((wsen[0]+wsen[2])/2, (wsen[1]+wsen[3])/2)
-        tiles = mercantile.tiles(wsen[0],
-                                 wsen[1],
-                                 wsen[2],
-                                 wsen[3],
-                                 self.rng)
-        self.city_tile_pairs[q] = tiles
-        self.region_meta[q] = {}
-        self.region_meta[q]['centroid'] = centroid
+        tile_generator = mercantile.tiles(wsen[0],
+                                          wsen[1],
+                                          wsen[2],
+                                          wsen[3],
+                                          self.rng)
+        self.city_tile_pairs[key] = {} 
+        self.city_tile_pairs[key]['name'] = name
+        self.city_tile_pairs[key]['tile_gen'] = tile_generator
+        self.city_tile_pairs[key]['centroid'] = ((wsen[0]+wsen[2])/2, (wsen[1]+wsen[3])/2)
+        self.city_tile_pairs[key]['bbox'] = wsen
 
     def _iter_tiles(self) -> dict:
         tile_tree = {}
         for k in self.city_tile_pairs.keys():
-            tiles = self.city_tile_pairs[k]
+            tiles = self.city_tile_pairs[k]['tile_gen']
             tile_tree[k] = {}
+            tile_tree[k]['name'] = self.city_tile_pairs[k]['name']
+            tile_tree[k]['centroid'] = self.city_tile_pairs[k]['centroid']
+            tile_tree[k]['bbox'] = self.city_tile_pairs[k]['bbox']
+            tile_tree[k]['tiles'] = {}
             for tile in tiles:
-                if tile.z not in tile_tree[k]:
-                    tile_tree[k][tile.z] = list()
-                    tile_tree[k][tile.z].append((tile.x, tile.y))
+                if tile.z not in tile_tree[k]['tiles']:
+                    tile_tree[k]['tiles'][tile.z] = list()
+                    tile_tree[k]['tiles'][tile.z].append((tile.x, tile.y))
                 else:
-                    tile_tree[k][tile.z].append((tile.x, tile.y))
+                    tile_tree[k]['tiles'][tile.z].append((tile.x, tile.y))
         return tile_tree
 
     def _create_city_key(self, city:str, id:str) -> str:

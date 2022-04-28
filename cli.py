@@ -35,7 +35,7 @@ def gentiletree(region:str, top_n:int, z_low:int, z_high:int, data_path:str) -> 
     click.echo(f'Launching geocoder for region "{region}", with top {top_n} cities and zoom range {z_low}-{z_high}.')
     API_KEY = os.environ.get("GOOGLE_MAPS_KEY")
     filename = f'{data_path}{region}cities.csv'
-    outpath = f'{data_path}{region}_tile_tree.json'
+    outpath = f'{data_path}{region}'
     gc = Geocoder(API_KEY, region, filename, z_low, z_high, top_n, outpath)
     gc.geocode()
 
