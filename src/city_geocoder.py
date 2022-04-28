@@ -21,7 +21,8 @@ class Geocoder():
         queries = self._read_data()
         self._process_queries(queries)
         tile_tree = self._iter_tiles()
-        json.dump(tile_tree, open(f'{self.outpath}', 'w'))
+        json.dump(tile_tree, open(f'{self.outpath}_tile_tree.json', 'w'))
+        json.dump(self.region_meta, open(f'{self.outpath}_meta', 'w'))
 
     def _read_data(self) -> list:
         queries = []
@@ -49,6 +50,7 @@ class Geocoder():
 
     def _process_queries(self, queries:list) -> None:
         self.city_tile_pairs = {}
+        self.region_meta = {}
         futures = []
         with ThreadPoolExecutor(max_workers=15) as executor:
             for q in queries:
@@ -62,22 +64,25 @@ class Geocoder():
                     print(e)
 
     def _geocode(self, q:list) -> str:
-        g = geocoder.google(f'metropolitan, {q[0]}', key = self.API_KEY)
-        self.city_tile_pairs[q[1]] = self._tiles_from_bbox(g)
+        g = geocoder.google(f'{q[0]}', key = self.API_KEY)
+        self._tiles_from_bbox(g, q[1])
         msg = f"Finished geocoding city: {q[0]}"
         return msg
 
-    def _tiles_from_bbox(self, g:dict) -> list:
+    def _tiles_from_bbox(self, g:dict,q:str):
         wsen = [g.json['bbox']['southwest'][1],
                 g.json['bbox']['southwest'][0],
                 g.json['bbox']['northeast'][1],
                 g.json['bbox']['northeast'][0]]
+        centroid = ((wsen[0]+wsen[2])/2, (wsen[1]+wsen[3])/2)
         tiles = mercantile.tiles(wsen[0],
                                  wsen[1],
                                  wsen[2],
                                  wsen[3],
                                  self.rng)
-        return tiles
+        self.city_tile_pairs[q] = tiles
+        self.region_meta[q] = {}
+        self.region_meta[q]['centroid'] = centroid
 
     def _iter_tiles(self) -> dict:
         tile_tree = {}
