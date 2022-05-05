@@ -48,7 +48,7 @@ class TileGenerator():
         self.tile_list = []
         if not os.path.isdir(f"{self.outpath}{self.city}"):
             os.mkdir(f"{self.outpath}{self.city}")
-        for zoom, v in tile_tree_dict[self.city].items():
+        for zoom, v in tile_tree_dict[self.city]['tiles'].items():
             if not os.path.isdir(f"{self.outpath}{self.city}/{zoom}"):
                 os.mkdir(f"{self.outpath}{self.city}/{zoom}")
             for tile_nr in v:
