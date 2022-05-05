@@ -32,6 +32,12 @@ class Geocoder():
                 census_key = self._create_census_key(row['NAME10'])
                 census_geom = row['geometry'].bounds
                 queries.append((row['NAME10'], census_key, census_geom))
+        else:
+            census = gpd.read_file("data/census_areas/lcma000a16a_e")
+            for idx, row in census.iterrows():
+                census_key = self._create_census_key(row['CMANAME'])
+                census_geom = row['geometry'].bounds
+                queries.append((row['CMANAME'], census_key, census_geom))
         return queries
 
     def _process_queries(self, queries:list) -> None:
@@ -83,12 +89,12 @@ class Geocoder():
                     tile_tree[k]['tiles'][tile.z].append((tile.x, tile.y))
                 tile_counter += 1
             print(f"Finished generating tiles for {tile_tree[k]['name']} with {tile_counter} tiles.")
-        return tile_tree, tile_counter
+        return tile_tree
 
     def _create_census_key(self, name:str) -> str:
         census_key = name.replace(", ", "_").lower()
+        census_key = census_key.replace(" - ", "_")
         census_key = census_key.replace(" ", "")
-        census_key = census_key.replace("-", "_")
         return census_key
 
     def _create_city_key(self, city:str, id:str) -> str:
