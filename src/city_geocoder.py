@@ -1,5 +1,6 @@
 from concurrent.futures import ThreadPoolExecutor
 from dotenv import load_dotenv
+from unidecode import unidecode
 
 import csv
 import geocoder
@@ -22,7 +23,7 @@ class Geocoder():
         queries = self._read_census()
         self._process_queries(queries)
         tile_tree = self._iter_tiles()
-        json.dump(tile_tree, open(f'{self.outpath}_tile_tree.json', 'w'))
+        json.dump(tile_tree, open(f'{self.outpath}_tile_tree.json', 'w'), indent=4,  sort_keys=True)
 
     def _read_census(self):
         queries = []
@@ -34,10 +35,12 @@ class Geocoder():
                 queries.append((row['NAME10'], census_key, census_geom))
         else:
             census = gpd.read_file("data/census_areas/lcma000a16a_e")
+            census = census.to_crs("epsg:4269")
             for idx, row in census.iterrows():
-                census_key = self._create_census_key(row['CMANAME'])
+                name = unidecode(row['CMANAME'])
+                census_key = self._create_census_key(name)
                 census_geom = row['geometry'].bounds
-                queries.append((row['CMANAME'], census_key, census_geom))
+                queries.append((name, census_key, census_geom))
         return queries
 
     def _process_queries(self, queries:list) -> None:
@@ -93,6 +96,7 @@ class Geocoder():
 
     def _create_census_key(self, name:str) -> str:
         census_key = name.replace(", ", "_").lower()
+        census_key = census_key.replace("--", "_")
         census_key = census_key.replace(" - ", "_")
         census_key = census_key.replace(" ", "")
         return census_key
