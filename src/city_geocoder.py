@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 
 import csv
 import geocoder
+import geopandas as gpd
 import json
 import mercantile
 import os
@@ -18,34 +19,19 @@ class Geocoder():
         self.outpath = outpath
 
     def geocode(self) -> None:
-        queries = self._read_data()
+        queries = self._read_census()
         self._process_queries(queries)
         tile_tree = self._iter_tiles()
         json.dump(tile_tree, open(f'{self.outpath}_tile_tree.json', 'w'))
-        #json.dump(self.region_meta, open(f'{self.outpath}_meta', 'w'))
 
-    def _read_data(self) -> list:
+    def _read_census(self):
         queries = []
-        with open(f'{self.file}', newline='') as f:
-            reader = csv.DictReader(f, delimiter=',')
-            for i,row in enumerate(reader):
-                if self.region == 'us':
-                    city = row['city']
-                    state = row['state_name']
-                    county = row['county_name']
-                    county_fips = row['county_fips']
-                    city_key = self._create_city_key(city, county_fips)
-                    print(city_key)
-                    queries.append((f'{city}, {county} County, {state}, United States', city_key))
-                elif self.region == 'can':
-                    city = row['city']
-                    province = row['province_name']
-                    province_id = row['province_id']
-                    city_key = self._create_city_key(city, province_id)
-                    print(city_key)
-                    queries.append((f'{city}, {province}, Canada', city_key))
-                if(i >= self.top_n):
-                    break
+        if self.region == 'us':
+            census = gpd.read_file("data/census_areas/tl_2021_us_uac10")
+            for idx, row in census.iterrows():
+                census_key = self._create_census_key(row['NAME10'])
+                census_geom = row['geometry'].bounds
+                queries.append((row['NAME10'], census_key, census_geom))
         return queries
 
     def _process_queries(self, queries:list) -> None:
@@ -63,26 +49,21 @@ class Geocoder():
                     print(e)
 
     def _geocode(self, q:list) -> str:
-        g = geocoder.google(f'{q[0]}', key = self.API_KEY)
-        self._tiles_from_bbox(g, q[0], q[1])
+        self._tilegen_from_census_bounds(q[2], q[0], q[1])
         msg = f"Finished geocoding city: {q[0]}"
         return msg
 
-    def _tiles_from_bbox(self, g:dict,name:str,key:str):
-        wsen = [g.json['bbox']['southwest'][1],
-                g.json['bbox']['southwest'][0],
-                g.json['bbox']['northeast'][1],
-                g.json['bbox']['northeast'][0]]
-        tile_generator = mercantile.tiles(wsen[0],
-                                          wsen[1],
-                                          wsen[2],
-                                          wsen[3],
+    def _tilegen_from_census_bounds(self, bounds:list, name:str, key:str):
+        tile_generator = mercantile.tiles(bounds[0],
+                                          bounds[1],
+                                          bounds[2],
+                                          bounds[3],
                                           self.rng)
         self.city_tile_pairs[key] = {} 
         self.city_tile_pairs[key]['name'] = name
         self.city_tile_pairs[key]['tile_gen'] = tile_generator
-        self.city_tile_pairs[key]['centroid'] = ((wsen[0]+wsen[2])/2, (wsen[1]+wsen[3])/2)
-        self.city_tile_pairs[key]['bbox'] = wsen
+        self.city_tile_pairs[key]['centroid'] = ((bounds[0]+bounds[2])/2, (bounds[1]+bounds[3])/2)
+        self.city_tile_pairs[key]['bbox'] = bounds
 
     def _iter_tiles(self) -> dict:
         tile_tree = {}
@@ -93,13 +74,22 @@ class Geocoder():
             tile_tree[k]['centroid'] = self.city_tile_pairs[k]['centroid']
             tile_tree[k]['bbox'] = self.city_tile_pairs[k]['bbox']
             tile_tree[k]['tiles'] = {}
+            tile_counter = 0
             for tile in tiles:
                 if tile.z not in tile_tree[k]['tiles']:
                     tile_tree[k]['tiles'][tile.z] = list()
                     tile_tree[k]['tiles'][tile.z].append((tile.x, tile.y))
                 else:
                     tile_tree[k]['tiles'][tile.z].append((tile.x, tile.y))
-        return tile_tree
+                tile_counter += 1
+            print(f"Finished generating tiles for {tile_tree[k]['name']} with {tile_counter} tiles.")
+        return tile_tree, tile_counter
+
+    def _create_census_key(self, name:str) -> str:
+        census_key = name.replace(", ", "_").lower()
+        census_key = census_key.replace(" ", "")
+        census_key = census_key.replace("-", "_")
+        return census_key
 
     def _create_city_key(self, city:str, id:str) -> str:
         city_key = f'{city.replace(" ", "_")}_{id}'.lower()
