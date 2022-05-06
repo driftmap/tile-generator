@@ -91,7 +91,8 @@ class Geocoder():
                 else:
                     tile_tree[k]['tiles'][tile.z].append((tile.x, tile.y))
                 tile_counter += 1
-            print(f"Finished generating tiles for {tile_tree[k]['name']} with {tile_counter} tiles.")
+            if tile_counter > 1000:
+                print(f"Finished generating tiles for {tile_tree[k]['name']} with {tile_counter} tiles.")
         return tile_tree
 
     def _create_census_key(self, name:str) -> str:
