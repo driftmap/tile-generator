@@ -1,5 +1,6 @@
 from concurrent.futures import ThreadPoolExecutor
 from dotenv import load_dotenv
+from mercantile import Tile
 from typing import Dict, List, Tuple
 from unidecode import unidecode
 
@@ -26,7 +27,7 @@ class Geocoder():
         tile_tree = self._iter_tiles()
         json.dump(tile_tree, open(f'{self.outpath}_tile_tree.json', 'w'), indent=4,  sort_keys=True)
 
-    def _read_us_census(self):
+    def _read_us_census(self) -> List[Tuple[str,str,Tuple[float,float,float,float]]]:
         queries = []
         census = gpd.read_file("data/census_areas/tl_2021_us_uac10")
         for idx, row in census.iterrows():
@@ -35,7 +36,7 @@ class Geocoder():
             queries.append((row['NAME10'], census_key, census_geom))
         return queries
 
-    def _read_can_census(self):
+    def _read_can_census(self) -> List[Tuple[str,str,Tuple[float,float,float,float]]]:
         queries = []
         census = gpd.read_file("data/census_areas/lcma000a16a_e")
         census = census.to_crs("epsg:4269")
@@ -93,7 +94,8 @@ class Geocoder():
         tile_tree[k]['tiles'] = {}
         return tile_tree
 
-    def _add_tiles(self, tile, city_tile_tree:Dict[str,Dict]) -> Dict[str,Dict]:
+    def _add_tiles(self, tile:Tile, city_tile_tree:Dict[str,Dict]) -> Dict[str,Dict]:
+        print(type(tile))
         if tile.z not in city_tile_tree['tiles']:
             city_tile_tree['tiles'][tile.z] = list()
             city_tile_tree['tiles'][tile.z].append((tile.x, tile.y))
