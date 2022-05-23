@@ -1,6 +1,6 @@
 from dotenv import load_dotenv
+from src.tile_server_iterator import TileServerIterator
 from src.tile_tree_generator import TileTreeGenerator
-from src.tile_iterator import TileIterator
 
 import click
 import os
@@ -35,8 +35,8 @@ def gentiletrees(region:str, top_n:int, z_low:int, z_high:int, data_path:str) ->
     API_KEY = os.environ.get("GOOGLE_MAPS_KEY")
     filename = f'{data_path}{region}cities.csv'
     outpath = f'{data_path}{region}'
-    ti = TileIterator(API_KEY, region, filename, z_low, z_high, top_n, outpath)
-    ti.tiles_from_tileserver()
+    ttg = TileTreeGenerator(API_KEY, region, filename, z_low, z_high, top_n, outpath)
+    ttg.generate_tile_trees_from_shapefiles()
 
 @click.command()
 @click.option("--region", type=click.Choice(['us', 'can']), required=True, help="Region to geocode.")
@@ -47,8 +47,8 @@ def gentiles(city_key:str, region:str, check_tiles:bool) -> None:
     OMT = os.environ.get("OMT_URL")
     filename = str(os.environ.get("DATA_PATH_CITY")) + f"{region}_tile_tree.json"
     outpath = "data/tiles/"
-    ttg = TileTreeGenerator(OMT,city_key,filename,outpath,check_tiles)
-    ttg.generate_tiletrees()
+    tsi = TileServerIterator(OMT,city_key,filename,outpath,check_tiles)
+    tsi.get_tiles_from_server()
 
 main.add_command(gentiletrees)
 main.add_command(gentiles)
