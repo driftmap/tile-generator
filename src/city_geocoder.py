@@ -1,5 +1,6 @@
 from concurrent.futures import ThreadPoolExecutor
 from dotenv import load_dotenv
+from typing import Dict, List, Tuple
 from unidecode import unidecode
 
 import csv
@@ -25,7 +26,7 @@ class Geocoder():
         tile_tree = self._iter_tiles()
         json.dump(tile_tree, open(f'{self.outpath}_tile_tree.json', 'w'), indent=4,  sort_keys=True)
 
-    def _read_census(self):
+    def _read_census(self) -> List[Tuple[str,str,Tuple[float,float,float,float]]]:
         queries = []
         if self.region == 'us':
             census = gpd.read_file("data/census_areas/tl_2021_us_uac10")
@@ -43,9 +44,10 @@ class Geocoder():
                 queries.append((name, census_key, census_geom))
         return queries
 
-    def _process_queries(self, queries:list) -> None:
+    def _process_queries(self, queries:List[Tuple[str,str,Tuple[float,float,float,float]]]) -> None:
         self.city_tile_pairs = {}
         futures = []
+        print(queries)
         with ThreadPoolExecutor(max_workers=15) as executor:
             for q in queries:
                 future = executor.submit(self._geocode, q)
@@ -53,16 +55,17 @@ class Geocoder():
 
             for future in futures:
                 try:
-                    print(future.result())
+                    #print(future.result())
+                    pass
                 except Exception as e:
                     print(e)
 
-    def _geocode(self, q:list) -> str:
+    def _geocode(self, q:Tuple[str,str,Tuple[float,float,float,float]]) -> str:
         self._tilegen_from_census_bounds(q[2], q[0], q[1])
         msg = f"Finished geocoding city: {q[0]}"
         return msg
 
-    def _tilegen_from_census_bounds(self, bounds:list, name:str, key:str):
+    def _tilegen_from_census_bounds(self, bounds:List[float], name:str, key:str):
         tile_generator = mercantile.tiles(bounds[0],
                                           bounds[1],
                                           bounds[2],
@@ -75,7 +78,7 @@ class Geocoder():
         self.city_tile_pairs[key]['centroid'] = ((bounds[0]+bounds[2])/2, (bounds[1]+bounds[3])/2)
         self.city_tile_pairs[key]['bbox'] = bounds
 
-    def _create_tile_tree(self, k:str) -> dict:
+    def _expand_tile_tree(self, tile_tree:Dict, k:str) -> Dict[str,Dict]:
         tile_tree[k] = {}
         tile_tree[k]['name'] = self.city_tile_pairs[k]['name']
         tile_tree[k]['centroid'] = self.city_tile_pairs[k]['centroid']
@@ -83,25 +86,25 @@ class Geocoder():
         tile_tree[k]['tiles'] = {}
         return tile_tree
 
-    def _add_tiles(self, tile, tile_tree:dict, k:str) -> dict:
-        if tile.z not in tile_tree[k]['tiles']:
-            tile_tree[k]['tiles'][tile.z] = list()
-            tile_tree[k]['tiles'][tile.z].append((tile.x, tile.y))
+    def _add_tiles(self, tile, city_tile_tree:Dict[str,Dict]) -> Dict[str,Dict]:
+        if tile.z not in city_tile_tree['tiles']:
+            city_tile_tree['tiles'][tile.z] = list()
+            city_tile_tree['tiles'][tile.z].append((tile.x, tile.y))
         else:
-            tile_tree[k]['tiles'][tile.z].append((tile.x, tile.y))
-        return tile_tree
+            city_tile_tree['tiles'][tile.z].append((tile.x, tile.y))
+        return city_tile_tree
 
-    def _iter_tiles(self) -> dict:
+    def _iter_tiles(self) -> Dict[str,Dict]:
         tile_tree = {}
         for k in self.city_tile_pairs.keys():
             tiles = self.city_tile_pairs[k]['tile_gen']
-            tile_tree = self._create_tile_tree(k)
+            tile_tree = self._expand_tile_tree(tile_tree, k)
             tile_counter = 0
             for tile in tiles:
-                tile_tree = self._add_tiles(tile, tile_tree, k)
+                tile_tree[k] = self._add_tiles(tile, tile_tree[k])
                 tile_counter += 1
-            if tile_counter > 1000:
-                print(f"Finished generating tiles for {tile_tree[k]['name']} with {tile_counter} tiles.")
+            #if tile_counter > 1000:
+                #print(f"Finished generating tiles for {tile_tree[k]['name']} with {tile_counter} tiles.")
         return tile_tree
 
     def _create_census_key(self, name:str) -> str:
