@@ -43,23 +43,36 @@ class TileGenerator():
             return result
         return wrapper
 
+    def _init_city_dir(self, tile_tree_dict):
+        if not os.path.isdir(f"{self.outpath}{self.city}"):
+            os.mkdir(f"{self.outpath}{self.city}")
+        json.dump(tile_tree_dict[self.city], open(f'{self.outpath}{self.city}/config.json', 'w'), indent=4,  sort_keys=True)
+
+    def _init_zoom_dir(self, zoom):
+        if not os.path.isdir(f"{self.outpath}{self.city}/{zoom}"):
+            os.mkdir(f"{self.outpath}{self.city}/{zoom}")
+
+    def _init_x_dir(self, zoom, x):
+        if not os.path.isdir(f"{self.outpath}{self.city}/{zoom}/{x}"):
+            os.mkdir(f"{self.outpath}{self.city}/{zoom}/{x}")
+
+    def _init_tile_req(self, tile_nr, x, y, zoom):
+        url = f"{self.OMT}{zoom}/{x}/{y}.pbf"
+        file = f"{self.outpath}{self.city}/{zoom}/{x}/{y}.pbf"
+        return url, file
+
     @_timer
     def generate_tiles(self) -> None:
         tile_tree_dict = json.load(open(f'{self.filename}', 'rb'))
         self.tile_list = []
-        if not os.path.isdir(f"{self.outpath}{self.city}"):
-            os.mkdir(f"{self.outpath}{self.city}")
-        json.dump(tile_tree_dict[self.city], open(f'{self.outpath}{self.city}/config.json', 'w'), indent=4,  sort_keys=True)
+        self._init_city_dir(tile_tree_dict)
         for zoom, v in tile_tree_dict[self.city]['tiles'].items():
-            if not os.path.isdir(f"{self.outpath}{self.city}/{zoom}"):
-                os.mkdir(f"{self.outpath}{self.city}/{zoom}")
+            self._init_zoom_dir(zoom)
             for tile_nr in v:
                 x = tile_nr[0]
                 y = tile_nr[1]
-                url = f"{self.OMT}{zoom}/{x}/{y}.pbf"
-                file = f"{self.outpath}{self.city}/{zoom}/{x}/{y}.pbf"
-                if not os.path.isdir(f"{self.outpath}{self.city}/{zoom}/{x}"):
-                    os.mkdir(f"{self.outpath}{self.city}/{zoom}/{x}")
+                url, file = self._init_tile_req(tile_nr, x, y, zoom)
+                self._init_x_dir(zoom, x)
                 self.tile_list.append(tuple((url, file)))
         self._download_tile_list()
 
