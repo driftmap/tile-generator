@@ -31,6 +31,7 @@ class TileGenerator():
         self.city = city_key
         self.filename = filename
         self.outpath = outpath
+        self.check_if_tile_exists = True
 
     def _timer(func):
         @wraps(func)
@@ -65,8 +66,8 @@ class TileGenerator():
     def _download_tile_list(self) -> None:
         futures = []
         with ThreadPoolExecutor(max_workers=15) as executor:
-            for tile_url in self.tile_list:
-                future = executor.submit(self._download_tile, tile_url)
+            for tile_req in self.tile_list:
+                future = executor.submit(self._download_tile, tile_req)
                 futures.append(future)
 
             for future in futures:
@@ -75,9 +76,16 @@ class TileGenerator():
                 except Exception as e:
                     print(e)
 
-    def _download_tile(self, url:tuple) -> str:
-        open(f'{url[1]}', 'wb').write(requests.get(url[0]).content)
-        msg = f"Finished downloading tile: {url[0]}"
+    def _download_tile(self, tile_req:tuple) -> str:
+        if self.check_if_tile_exists:
+            if os.path.isfile(tile_req[1]):
+                msg = f"File '{tile_req[1]}' already exists."
+            else:
+                open(f'{tile_req[1]}', 'wb').write(requests.get(tile_req[0]).content)
+                msg = f"Finished downloading tile: {url[0]}"
+        else:
+            open(f'{tile_req[1]}', 'wb').write(requests.get(tile_req[0]).content)
+            msg = f"Finished downloading tile: {tile_req[0]}"
         return msg
 
 if __name__ == "__main__":
