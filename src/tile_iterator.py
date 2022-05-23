@@ -19,7 +19,7 @@ class TileIterator():
         self.top_n = top_n
         self.outpath = outpath
 
-    def geocode(self) -> None:
+    def tiles_from_tileserver(self) -> None:
         queries = self._read_census()
         self._process_queries(queries)
         tile_tree = self._iter_tiles()
@@ -111,6 +111,7 @@ class TileIterator():
                 tile_counter += 1
             if tile_counter > 1000:
                 print(f"Finished generating tiles for {tile_tree[k]['name']} with {tile_counter} tiles.")
+            tile_tree[k]['nr_tiles'] = tile_counter
         return tile_tree
 
     def _create_census_key(self, name:str) -> str:
