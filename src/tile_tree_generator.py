@@ -78,17 +78,18 @@ class TileTreeGenerator():
                                bounds[3],
                                self.rng)
         self.city_tile_pairs[key] = {} 
-        self.city_tile_pairs[key]['key'] = key
-        self.city_tile_pairs[key]['name'] = name
+        self.city_tile_pairs[key]['_key'] = key
+        self.city_tile_pairs[key]['_name'] = name
         self.city_tile_pairs[key]['tile_gen'] = tile_generator
-        self.city_tile_pairs[key]['centroid'] = ((bounds[0]+bounds[2])/2, (bounds[1]+bounds[3])/2)
-        self.city_tile_pairs[key]['bbox'] = bounds
+        self.city_tile_pairs[key]['_centroid'] = ((bounds[0]+bounds[2])/2, (bounds[1]+bounds[3])/2)
+        self.city_tile_pairs[key]['_bbox'] = bounds
 
     def _expand_tile_tree(self, tile_tree:Dict, k:str) -> Dict[str,Dict]:
         tile_tree[k] = {}
-        tile_tree[k]['name'] = self.city_tile_pairs[k]['name']
-        tile_tree[k]['centroid'] = self.city_tile_pairs[k]['centroid']
-        tile_tree[k]['bbox'] = self.city_tile_pairs[k]['bbox']
+        tile_tree[k]['_name'] = self.city_tile_pairs[k]['_name']
+        tile_tree[k]['_centroid'] = self.city_tile_pairs[k]['_centroid']
+        tile_tree[k]['_bbox'] = self.city_tile_pairs[k]['_bbox']
+        tile_tree[k]['_key'] = self.city_tile_pairs[k]['_key']
         tile_tree[k]['tiles'] = {}
         return tile_tree
 
@@ -110,8 +111,8 @@ class TileTreeGenerator():
                 tile_tree[k] = self._add_tiles(tile, tile_tree[k])
                 tile_counter += 1
             if tile_counter > 1000:
-                print(f"Finished generating tiles for {tile_tree[k]['name']} with {tile_counter} tiles.")
-            tile_tree[k]['nr_tiles'] = tile_counter
+                print(f"Finished generating tiles for {tile_tree[k]['_name']} with {tile_counter} tiles.")
+            tile_tree[k]['_nr_tiles'] = tile_counter
         return tile_tree
 
     def _create_census_key(self, name:str) -> str:
