@@ -26,12 +26,12 @@ Cleaned up Fetch time after threaded:
 """
 
 class TileGenerator():
-    def __init__(self, OMT:str, city_key:str, filename:str, outpath:str) -> None:
+    def __init__(self, OMT:str, city_key:str, filename:str, outpath:str, check_if_tile_exists:bool) -> None:
         self.OMT = OMT
         self.city = city_key
         self.filename = filename
         self.outpath = outpath
-        self.check_if_tile_exists = True
+        self.check_if_tile_exists = check_if_tile_exists
 
     def _timer(func):
         @wraps(func)
