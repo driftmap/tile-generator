@@ -48,6 +48,7 @@ class TileGenerator():
         self.tile_list = []
         if not os.path.isdir(f"{self.outpath}{self.city}"):
             os.mkdir(f"{self.outpath}{self.city}")
+        json.dump(tile_tree_dict[self.city], open(f'{self.outpath}{self.city}/config.json', 'w'), indent=4,  sort_keys=True)
         for zoom, v in tile_tree_dict[self.city]['tiles'].items():
             if not os.path.isdir(f"{self.outpath}{self.city}/{zoom}"):
                 os.mkdir(f"{self.outpath}{self.city}/{zoom}")
