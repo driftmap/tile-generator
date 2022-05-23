@@ -74,22 +74,30 @@ class Geocoder():
         self.city_tile_pairs[key]['centroid'] = ((bounds[0]+bounds[2])/2, (bounds[1]+bounds[3])/2)
         self.city_tile_pairs[key]['bbox'] = bounds
 
+    def _create_tile_tree(self, k:str) -> dict:
+        tile_tree[k] = {}
+        tile_tree[k]['name'] = self.city_tile_pairs[k]['name']
+        tile_tree[k]['centroid'] = self.city_tile_pairs[k]['centroid']
+        tile_tree[k]['bbox'] = self.city_tile_pairs[k]['bbox']
+        tile_tree[k]['tiles'] = {}
+        return tile_tree
+
+    def _add_tiles(self, tile, tile_tree:dict, k:str) -> dict:
+        if tile.z not in tile_tree[k]['tiles']:
+            tile_tree[k]['tiles'][tile.z] = list()
+            tile_tree[k]['tiles'][tile.z].append((tile.x, tile.y))
+        else:
+            tile_tree[k]['tiles'][tile.z].append((tile.x, tile.y))
+        return tile_tree
+
     def _iter_tiles(self) -> dict:
         tile_tree = {}
         for k in self.city_tile_pairs.keys():
             tiles = self.city_tile_pairs[k]['tile_gen']
-            tile_tree[k] = {}
-            tile_tree[k]['name'] = self.city_tile_pairs[k]['name']
-            tile_tree[k]['centroid'] = self.city_tile_pairs[k]['centroid']
-            tile_tree[k]['bbox'] = self.city_tile_pairs[k]['bbox']
-            tile_tree[k]['tiles'] = {}
+            tile_tree = self._create_tile_tree(k)
             tile_counter = 0
             for tile in tiles:
-                if tile.z not in tile_tree[k]['tiles']:
-                    tile_tree[k]['tiles'][tile.z] = list()
-                    tile_tree[k]['tiles'][tile.z].append((tile.x, tile.y))
-                else:
-                    tile_tree[k]['tiles'][tile.z].append((tile.x, tile.y))
+                tile_tree = self._add_tiles(tile, tile_tree, k)
                 tile_counter += 1
             if tile_counter > 1000:
                 print(f"Finished generating tiles for {tile_tree[k]['name']} with {tile_counter} tiles.")
