@@ -47,22 +47,20 @@ class Geocoder():
     def _process_queries(self, queries:List[Tuple[str,str,Tuple[float,float,float,float]]]) -> None:
         self.city_tile_pairs = {}
         futures = []
-        print(queries)
         with ThreadPoolExecutor(max_workers=15) as executor:
             for q in queries:
-                future = executor.submit(self._geocode, q)
+                future = executor.submit(self._gen_query, q)
                 futures.append(future)
 
             for future in futures:
                 try:
-                    #print(future.result())
-                    pass
+                    print(future.result())
                 except Exception as e:
                     print(e)
 
-    def _geocode(self, q:Tuple[str,str,Tuple[float,float,float,float]]) -> str:
+    def _gen_query(self, q:Tuple[str,str,Tuple[float,float,float,float]]) -> str:
         self._tilegen_from_census_bounds(q[2], q[0], q[1])
-        msg = f"Finished geocoding city: {q[0]}"
+        msg = f"Loaded census data for city: {q[0]}"
         return msg
 
     def _tilegen_from_census_bounds(self, bounds:List[float], name:str, key:str):
@@ -103,8 +101,8 @@ class Geocoder():
             for tile in tiles:
                 tile_tree[k] = self._add_tiles(tile, tile_tree[k])
                 tile_counter += 1
-            #if tile_counter > 1000:
-                #print(f"Finished generating tiles for {tile_tree[k]['name']} with {tile_counter} tiles.")
+            if tile_counter > 1000:
+                print(f"Finished generating tiles for {tile_tree[k]['name']} with {tile_counter} tiles.")
         return tile_tree
 
     def _create_census_key(self, name:str) -> str:
