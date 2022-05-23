@@ -26,11 +26,12 @@ Cleaned up Fetch time after threaded:
 """
 
 class TileGenerator():
-    def __init__(self, OMT:str, city_key:str, filename:str, outpath:str) -> None:
+    def __init__(self, OMT:str, city_key:str, filename:str, outpath:str, check_if_tile_exists:bool) -> None:
         self.OMT = OMT
         self.city = city_key
         self.filename = filename
         self.outpath = outpath
+        self.check_if_tile_exists = check_if_tile_exists
 
     def _timer(func):
         @wraps(func)
@@ -42,30 +43,44 @@ class TileGenerator():
             return result
         return wrapper
 
+    def _init_city_dir(self, tile_tree_dict):
+        if not os.path.isdir(f"{self.outpath}{self.city}"):
+            os.mkdir(f"{self.outpath}{self.city}")
+        json.dump(tile_tree_dict[self.city], open(f'{self.outpath}{self.city}/config.json', 'w'), indent=4,  sort_keys=True)
+
+    def _init_zoom_dir(self, zoom):
+        if not os.path.isdir(f"{self.outpath}{self.city}/{zoom}"):
+            os.mkdir(f"{self.outpath}{self.city}/{zoom}")
+
+    def _init_x_dir(self, zoom, x):
+        if not os.path.isdir(f"{self.outpath}{self.city}/{zoom}/{x}"):
+            os.mkdir(f"{self.outpath}{self.city}/{zoom}/{x}")
+
+    def _init_tile_req(self, tile_nr, x, y, zoom):
+        url = f"{self.OMT}{zoom}/{x}/{y}.pbf"
+        file = f"{self.outpath}{self.city}/{zoom}/{x}/{y}.pbf"
+        return url, file
+
     @_timer
     def generate_tiles(self) -> None:
         tile_tree_dict = json.load(open(f'{self.filename}', 'rb'))
         self.tile_list = []
-        if not os.path.isdir(f"{self.outpath}{self.city}"):
-            os.mkdir(f"{self.outpath}{self.city}")
+        self._init_city_dir(tile_tree_dict)
         for zoom, v in tile_tree_dict[self.city]['tiles'].items():
-            if not os.path.isdir(f"{self.outpath}{self.city}/{zoom}"):
-                os.mkdir(f"{self.outpath}{self.city}/{zoom}")
+            self._init_zoom_dir(zoom)
             for tile_nr in v:
                 x = tile_nr[0]
                 y = tile_nr[1]
-                url = f"{self.OMT}{zoom}/{x}/{y}.pbf"
-                file = f"{self.outpath}{self.city}/{zoom}/{x}/{y}.pbf"
-                if not os.path.isdir(f"{self.outpath}{self.city}/{zoom}/{x}"):
-                    os.mkdir(f"{self.outpath}{self.city}/{zoom}/{x}")
+                url, file = self._init_tile_req(tile_nr, x, y, zoom)
+                self._init_x_dir(zoom, x)
                 self.tile_list.append(tuple((url, file)))
         self._download_tile_list()
 
     def _download_tile_list(self) -> None:
         futures = []
         with ThreadPoolExecutor(max_workers=15) as executor:
-            for tile_url in self.tile_list:
-                future = executor.submit(self._download_tile, tile_url)
+            for tile_req in self.tile_list:
+                future = executor.submit(self._download_tile, tile_req)
                 futures.append(future)
 
             for future in futures:
@@ -74,9 +89,16 @@ class TileGenerator():
                 except Exception as e:
                     print(e)
 
-    def _download_tile(self, url:tuple) -> str:
-        open(f'{url[1]}', 'wb').write(requests.get(url[0]).content)
-        msg = f"Finished downloading tile: {url[0]}"
+    def _download_tile(self, tile_req:tuple) -> str:
+        if self.check_if_tile_exists:
+            if os.path.isfile(tile_req[1]):
+                msg = f"File '{tile_req[1]}' already exists."
+            else:
+                open(f'{tile_req[1]}', 'wb').write(requests.get(tile_req[0]).content)
+                msg = f"Finished downloading tile: {url[0]}"
+        else:
+            open(f'{tile_req[1]}', 'wb').write(requests.get(tile_req[0]).content)
+            msg = f"Finished downloading tile: {tile_req[0]}"
         return msg
 
 if __name__ == "__main__":
