@@ -36,8 +36,8 @@ def gentiletree(region:str, top_n:int, z_low:int, z_high:int, data_path:str) -> 
     API_KEY = os.environ.get("GOOGLE_MAPS_KEY")
     filename = f'{data_path}{region}cities.csv'
     outpath = f'{data_path}{region}'
-    gc = Geocoder(API_KEY, region, filename, z_low, z_high, top_n, outpath)
-    gc.geocode()
+    ti = TileIterator(API_KEY, region, filename, z_low, z_high, top_n, outpath)
+    ti.tiles_from_tileserver()
 
 @click.command()
 @click.option("--region", type=click.Choice(['us', 'can']), required=True, help="Region to geocode.")
@@ -48,8 +48,8 @@ def gentiles(city_key:str, region:str, check_tiles:bool) -> None:
     OMT = os.environ.get("OMT_URL")
     filename = str(os.environ.get("DATA_PATH_CITY")) + f"{region}_tile_tree.json"
     outpath = "data/tiles/"
-    tg = TileGenerator(OMT,city_key,filename,outpath,check_tiles)
-    tg.generate_tiles()
+    ttg = TileTreeGenerator(OMT,city_key,filename,outpath,check_tiles)
+    ttg.generate_tiletrees()
 
 main.add_command(gentiletree)
 main.add_command(gentiles)

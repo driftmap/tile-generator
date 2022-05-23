@@ -1,18 +1,16 @@
 from concurrent.futures import ThreadPoolExecutor
 from dotenv import load_dotenv
-from mercantile import Tile
+from mercantile import tiles, Tile
 from typing import Dict, List, Tuple
 from unidecode import unidecode
 
 import csv
-import geocoder
 import geopandas as gpd
 import json
-import mercantile
 import os
 import pickle
 
-class Geocoder():
+class TileIterator():
     def __init__(self, API_KEY:str, region:str, file:str, z_low:int, z_high:int, top_n:int, outpath:str) -> None:
         self.API_KEY = API_KEY
         self.region = region
@@ -74,11 +72,11 @@ class Geocoder():
         return msg
 
     def _tilegen_from_census_bounds(self, bounds:List[float], name:str, key:str):
-        tile_generator = mercantile.tiles(bounds[0],
-                                          bounds[1],
-                                          bounds[2],
-                                          bounds[3],
-                                          self.rng)
+        tile_generator = tiles(bounds[0],
+                               bounds[1],
+                               bounds[2],
+                               bounds[3],
+                               self.rng)
         self.city_tile_pairs[key] = {} 
         self.city_tile_pairs[key]['key'] = key
         self.city_tile_pairs[key]['name'] = name
@@ -95,7 +93,6 @@ class Geocoder():
         return tile_tree
 
     def _add_tiles(self, tile:Tile, city_tile_tree:Dict[str,Dict]) -> Dict[str,Dict]:
-        print(type(tile))
         if tile.z not in city_tile_tree['tiles']:
             city_tile_tree['tiles'][tile.z] = list()
             city_tile_tree['tiles'][tile.z].append((tile.x, tile.y))
