@@ -26,22 +26,31 @@ class Geocoder():
         tile_tree = self._iter_tiles()
         json.dump(tile_tree, open(f'{self.outpath}_tile_tree.json', 'w'), indent=4,  sort_keys=True)
 
-    def _read_census(self) -> List[Tuple[str,str,Tuple[float,float,float,float]]]:
+    def _read_us_census(self):
         queries = []
+        census = gpd.read_file("data/census_areas/tl_2021_us_uac10")
+        for idx, row in census.iterrows():
+            census_key = self._create_census_key(row['NAME10'])
+            census_geom = row['geometry'].bounds
+            queries.append((row['NAME10'], census_key, census_geom))
+        return queries
+
+    def _read_can_census(self):
+        queries = []
+        census = gpd.read_file("data/census_areas/lcma000a16a_e")
+        census = census.to_crs("epsg:4269")
+        for idx, row in census.iterrows():
+            name = unidecode(row['CMANAME'])
+            census_key = self._create_census_key(name)
+            census_geom = row['geometry'].bounds
+            queries.append((name, census_key, census_geom))
+        return queries
+
+    def _read_census(self) -> List[Tuple[str,str,Tuple[float,float,float,float]]]:
         if self.region == 'us':
-            census = gpd.read_file("data/census_areas/tl_2021_us_uac10")
-            for idx, row in census.iterrows():
-                census_key = self._create_census_key(row['NAME10'])
-                census_geom = row['geometry'].bounds
-                queries.append((row['NAME10'], census_key, census_geom))
+            queries = self._read_us_census()
         else:
-            census = gpd.read_file("data/census_areas/lcma000a16a_e")
-            census = census.to_crs("epsg:4269")
-            for idx, row in census.iterrows():
-                name = unidecode(row['CMANAME'])
-                census_key = self._create_census_key(name)
-                census_geom = row['geometry'].bounds
-                queries.append((name, census_key, census_geom))
+            queries = self._read_can_census()
         return queries
 
     def _process_queries(self, queries:List[Tuple[str,str,Tuple[float,float,float,float]]]) -> None:
