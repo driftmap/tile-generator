@@ -69,6 +69,7 @@ class Geocoder():
                                           bounds[3],
                                           self.rng)
         self.city_tile_pairs[key] = {} 
+        self.city_tile_pairs[key]['key'] = key
         self.city_tile_pairs[key]['name'] = name
         self.city_tile_pairs[key]['tile_gen'] = tile_generator
         self.city_tile_pairs[key]['centroid'] = ((bounds[0]+bounds[2])/2, (bounds[1]+bounds[3])/2)
