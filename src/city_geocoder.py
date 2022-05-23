@@ -23,7 +23,7 @@ class Geocoder():
         queries = self._read_census()
         self._process_queries(queries)
         tile_tree = self._iter_tiles()
-        json.dump(tile_tree[city_key], open(f'{self.outpath}_tile_tree.json', 'w'), indent=4,  sort_keys=True)
+        json.dump(tile_tree, open(f'{self.outpath}_tile_tree.json', 'w'), indent=4,  sort_keys=True)
 
     def _read_census(self):
         queries = []
