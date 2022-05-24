@@ -19,16 +19,17 @@ class TileTreeGenerator():
         self.top_n = top_n
         self.outpath = outpath
 
-    def generate_tile_trees_from_shapefiles(self, path) -> None:
+    def generate_tile_trees_from_shapefiles(self) -> None:
         queries = self._read_census()
         self._process_queries(queries)
-        tile_tree = self._iter_tiles()
+        tile_tree, tile_diagnostics = self._iter_tiles()
+        print("Tiles with more than 5k tiles:")
+        print(dict(sorted(tile_diagnostics.items(), key=lambda item: item[1])))
         json.dump(tile_tree, open(f'{self.outpath}_tile_tree.json', 'w'), indent=4,  sort_keys=True)
 
-    def _read_us_census(self, 
-                        file:str="tl_2021_us_uac10") -> List[Tuple[str,str,Tuple[float,float,float,float]]]:
+    def _read_us_census(self) -> List[Tuple[str,str,Tuple[float,float,float,float]]]:
         queries = []
-        census = gpd.read_file(f"data/census_areas/{file}")
+        census = gpd.read_file(f"data/census_areas/tl_2021_us_uac10")
         name_col = [col for col in census if col.startswith('NAME')][0]
         geom_col = [col for col in census if col.startswith('geom')][0]
         for idx, row in census.iterrows():
@@ -48,7 +49,7 @@ class TileTreeGenerator():
             queries.append((name, census_key, census_geom))
         return queries
 
-    def _read_census(self, file:str) -> List[Tuple[str,str,Tuple[float,float,float,float]]]:
+    def _read_census(self) -> List[Tuple[str,str,Tuple[float,float,float,float]]]:
         if self.region == 'us':
             queries = self._read_us_census()
         else:
@@ -105,6 +106,7 @@ class TileTreeGenerator():
         return city_tile_tree
 
     def _iter_tiles(self) -> Dict[str,Dict]:
+        tile_diagnostics = {}
         tile_tree = {}
         for k in self.city_tile_pairs.keys():
             tiles = self.city_tile_pairs[k]['tile_gen']
@@ -116,7 +118,8 @@ class TileTreeGenerator():
             if tile_counter > 1000:
                 print(f"Finished generating tiles for {tile_tree[k]['_name']} with {tile_counter} tiles.")
             tile_tree[k]['_nr_tiles'] = tile_counter
-        return tile_tree
+            tile_diagnostics[k] = tile_counter
+        return tile_tree, tile_diagnostics
 
     def _create_census_key(self, name:str) -> str:
         census_key = name.replace(", ", "_").lower()
