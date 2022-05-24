@@ -12,6 +12,11 @@ This city boundary shapefile was extracted from Esri Data and Maps for ArcGIS 20
 
 **Source**: [Data.gov](https://catalog.data.gov/dataset/500-cities-city-boundaries)
 
+|Folder name|Publisher|Source|
+|---|---|---|
+|500Cities_City_11082016|Centers for Disease Control and Prevention|Centers for Disease Control and Prevention
+|
+
 ### TIGER/Line Shapefile, 2019, nation, U.S., Current Metropolitan Statistical Area/Micropolitan Statistical Area (CBSA) National 
 
 The TIGER/Line shapefiles and related database files (.dbf) are an extract of selected geographic and cartographic information from the U.S. Census Bureau's Master Address File / Topologically Integrated Geographic Encoding and Referencing (MAF/TIGER) Database (MTDB). The MTDB represents a seamless national file with no overlaps or gaps between parts, however, each TIGER/Line shapefile is designed to stand alone as an independent data set, or they can be combined to cover the entire nation.
