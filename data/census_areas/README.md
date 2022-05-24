@@ -14,7 +14,7 @@ This city boundary shapefile was extracted from Esri Data and Maps for ArcGIS 20
 
 |Folder name|Publisher|Source|
 |---|---|---|
-|500Cities_City_11082016|Centers for Disease Control and Prevention|Centers for Disease Control and Prevention
+|500Cities_City_11082016|Centers for Disease Control and Prevention|[Data.gov](https://catalog.data.gov/dataset/500-cities-city-boundaries)
 |
 
 ### TIGER/Line Shapefile, 2019, nation, U.S., Current Metropolitan Statistical Area/Micropolitan Statistical Area (CBSA) National 
