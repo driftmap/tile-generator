@@ -6,16 +6,9 @@
 
 This city boundary shapefile was extracted from Esri Data and Maps for ArcGIS 2014 - U.S. Populated Place Areas. This shapefile can be joined to 500 Cities city-level Data (GIS Friendly Format) in a geographic information system (GIS) to make city-level maps.
 
-**Folder name:** 500Cities_City_11082016
-
-**Publisher:** Centers for Disease Control and Prevention
-
-**Source**: [Data.gov](https://catalog.data.gov/dataset/500-cities-city-boundaries)
-
 |Folder name|Publisher|Source|
-|---|---|---|
-|500Cities_City_11082016|Centers for Disease Control and Prevention|[Data.gov](https://catalog.data.gov/dataset/500-cities-city-boundaries)
-|
+|-----------|---------|------|
+|500Cities_City_11082016|Centers for Disease Control and Prevention|[Data.gov](https://catalog.data.gov/dataset/500-cities-city-boundaries)|
 
 ### TIGER/Line Shapefile, 2019, nation, U.S., Current Metropolitan Statistical Area/Micropolitan Statistical Area (CBSA) National 
 
@@ -25,9 +18,9 @@ Metropolitan and Micropolitan Statistical Areas are together termed Core Based S
 
 The CBSA boundaries are those defined by OMB based on the 2010 Census, published in 2013, and updated in 2018.
 
-Folder name: tl_2019_us_cbsa
-Publisher: [U.S. Census Bureau](https://www.census.gov/geographies/mapping-files/time-series/geo/tiger-line-file.html)
-Source: [Data.Gov](https://catalog.data.gov/dataset/tiger-line-shapefile-2019-nation-u-s-current-metropolitan-statistical-area-micropolitan-statist)
+|Folder name|Publisher|Source|
+|-----------|---------|------|
+|tl_2019_us_cbsa|[U.S. Census Bureau](https://www.census.gov/geographies/mapping-files/time-series/geo/tiger-line-file.html)|[Data.Gov](https://catalog.data.gov/dataset/tiger-line-shapefile-2019-nation-u-s-current-metropolitan-statistical-area-micropolitan-statist)|
 
 ### 2021 TIGER/Line Shapefiles: Urban Areas
 
@@ -40,9 +33,9 @@ For the 2010 Census, an urban area will comprise a densely settled core of censu
 
 “Rural” encompasses all population, housing, and territory not included within an urban area.
 
-Folder name: tl_2021_us_uac10
-Publisher: U.S. Census Bureau
-Source: [Census.Gov](https://www.census.gov/cgi-bin/geo/shapefiles/index.php?year=2021&layergroup=Urban+Areas)
+|Folder name|Publisher|Source|
+|-----------|---------|------|
+|tl_2021_us_uac10|U.S. Census Bureau|[Census.Gov](https://www.census.gov/cgi-bin/geo/shapefiles/index.php?year=2021&layergroup=Urban+Areas)|
 
 ## Canada
 
@@ -50,6 +43,6 @@ Source: [Census.Gov](https://www.census.gov/cgi-bin/geo/shapefiles/index.php?yea
 
 > Census Metropolitan Areas and Census Agglomerations, Digital Boundary File - 2016 Census
 
-Folder name: lcma000a16a_e
-Publisher: Statistics Canada 
-Source: [Open.Canada.Ca](https://open.canada.ca/data/en/dataset/a1e5fa53-2a93-4c5e-89a3-6cbfd9bec199)
+|Folder name|Publisher|Source|
+|-----------|---------|------|
+|lcma000a16a_e|Statistics Canada |[Open.Canada.Ca](https://open.canada.ca/data/en/dataset/a1e5fa53-2a93-4c5e-89a3-6cbfd9bec199)|
