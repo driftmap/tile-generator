@@ -1,4 +1,5 @@
 from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime
 from dotenv import load_dotenv
 from functools import wraps
 from typing import overload, Callable, Dict, Tuple
@@ -66,6 +67,7 @@ class TileServerIterator():
     def _update_city_metadata(self, tile_tree_dict):
         tile_tree_dict[self.city]['_total_tile_size'] = self.tilesize
         tile_tree_dict[self.city]['_avg_tile_size'] = self.tilesize / tile_tree_dict[self.city]['_nr_tiles']
+        tile_tree_dict[self.city]['_updated'] = datetime.now().strftime("%Y_%m_%d-%I:%M:%S_%p")
         json.dump(tile_tree_dict[self.city], 
                   open(f'{self.outpath}{self.city}/config.json', 'w'), 
                   indent=4,  

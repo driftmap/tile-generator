@@ -25,7 +25,7 @@ def main() -> None:
     pass
 
 @click.command()
-@click.option("--region", type=click.Choice(['us', 'can']), required=True, help="Region to geocode.")
+@click.option("--region", type=click.Choice(['us', 'can', 'beta']), required=True, help="Region to geocode.")
 @click.option("--top-n", default=10, help="Number of cities to geocode.")
 @click.option("--z-low", default=5, help="Lower bound of zoom.")
 @click.option("--z-high", default=15, help="Upper bound of zoom.")
@@ -39,7 +39,7 @@ def gentiletrees(region:str, top_n:int, z_low:int, z_high:int, data_path:str) ->
     ttg.generate_tile_trees_from_shapefiles()
 
 @click.command()
-@click.option("--region", type=click.Choice(['us', 'can']), required=True, help="Region to geocode.")
+@click.option("--region", type=click.Choice(['us', 'can','beta']), required=True, help="Region to geocode.")
 @click.option("--city_key", default="atlanta_ga", help=city_key_help)
 @click.option("--check_tiles", default=True, help=city_key_help)
 def itertileserver(city_key:str, region:str, check_tiles:bool) -> None:
