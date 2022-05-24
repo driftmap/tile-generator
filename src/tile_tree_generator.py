@@ -19,19 +19,22 @@ class TileTreeGenerator():
         self.top_n = top_n
         self.outpath = outpath
 
-    def generate_tile_trees_from_shapefiles(self) -> None:
+    def generate_tile_trees_from_shapefiles(self, path) -> None:
         queries = self._read_census()
         self._process_queries(queries)
         tile_tree = self._iter_tiles()
         json.dump(tile_tree, open(f'{self.outpath}_tile_tree.json', 'w'), indent=4,  sort_keys=True)
 
-    def _read_us_census(self) -> List[Tuple[str,str,Tuple[float,float,float,float]]]:
+    def _read_us_census(self, 
+                        file:str="tl_2021_us_uac10") -> List[Tuple[str,str,Tuple[float,float,float,float]]]:
         queries = []
-        census = gpd.read_file("data/census_areas/tl_2021_us_uac10")
+        census = gpd.read_file(f"data/census_areas/{file}")
+        name_col = [col for col in census if col.startswith('NAME')][0]
+        geom_col = [col for col in census if col.startswith('geom')][0]
         for idx, row in census.iterrows():
-            census_key = self._create_census_key(row['NAME10'])
-            census_geom = row['geometry'].bounds
-            queries.append((row['NAME10'], census_key, census_geom))
+            census_key = self._create_census_key(row[name_col])
+            census_geom = row[geom_col].bounds
+            queries.append((row[name_col], census_key, census_geom))
         return queries
 
     def _read_can_census(self) -> List[Tuple[str,str,Tuple[float,float,float,float]]]:
@@ -45,7 +48,7 @@ class TileTreeGenerator():
             queries.append((name, census_key, census_geom))
         return queries
 
-    def _read_census(self) -> List[Tuple[str,str,Tuple[float,float,float,float]]]:
+    def _read_census(self, file:str) -> List[Tuple[str,str,Tuple[float,float,float,float]]]:
         if self.region == 'us':
             queries = self._read_us_census()
         else:
@@ -89,7 +92,7 @@ class TileTreeGenerator():
         tile_tree[k]['_name'] = self.city_tile_pairs[k]['_name']
         tile_tree[k]['_centroid'] = self.city_tile_pairs[k]['_centroid']
         tile_tree[k]['_bbox'] = self.city_tile_pairs[k]['_bbox']
-        tile_tree[k]['_key'] = self.city_tile_pairs[k]['_key']
+        tile_tree[k]['_key'] = self.city_tile_pairs[k]['_bbox']
         tile_tree[k]['tiles'] = {}
         return tile_tree
 
