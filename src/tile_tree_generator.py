@@ -23,13 +23,23 @@ class TileTreeGenerator():
         queries = self._read_census()
         self._process_queries(queries)
         tile_tree, tile_diagnostics = self._iter_tiles()
-        print("Tiles with more than 5k tiles:")
+        print("Total tile counts by city:")
         print(dict(sorted(tile_diagnostics.items(), key=lambda item: item[1])))
         json.dump(tile_tree, open(f'{self.outpath}_tile_tree.json', 'w'), indent=4,  sort_keys=True)
 
+    def _read_beta_census(self) -> List[Tuple[str,str,Tuple[float,float,float,float]]]:
+        queries = []
+        census = gpd.read_file(f"data/census_areas/beta")
+        for idx, row in census.iterrows():
+            print(row['NAME'])
+            census_key = self._create_census_key(row['NAME'])
+            census_geom = row['geometry'].bounds
+            queries.append((row['NAME'], census_key, census_geom))
+        return queries
+
     def _read_us_census(self) -> List[Tuple[str,str,Tuple[float,float,float,float]]]:
         queries = []
-        census = gpd.read_file(f"data/census_areas/tl_2021_us_uac10")
+        census = gpd.read_file(f"data/census_areas/beta")
         name_col = [col for col in census if col.startswith('NAME')][0]
         geom_col = [col for col in census if col.startswith('geom')][0]
         for idx, row in census.iterrows():
@@ -52,8 +62,10 @@ class TileTreeGenerator():
     def _read_census(self) -> List[Tuple[str,str,Tuple[float,float,float,float]]]:
         if self.region == 'us':
             queries = self._read_us_census()
-        else:
+        if self.region == 'can':
             queries = self._read_can_census()
+        else:
+            queries = self._read_beta_census()
         return queries
 
     def _process_queries(self, queries:List[Tuple[str,str,Tuple[float,float,float,float]]]) -> None:
