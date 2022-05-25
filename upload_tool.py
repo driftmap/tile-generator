@@ -4,7 +4,7 @@ import os
 
 load_dotenv()
 
-def recursive_upload(server, local, remote, preserve_mtime=False):
+def recursive_upload(server, local, remote):
     for name in os.listdir(local):
         rpath = remote + "/" + name
         lpath = os.path.join(local, name)
@@ -15,9 +15,9 @@ def recursive_upload(server, local, remote, preserve_mtime=False):
 
             except OSError:     
                 pass
-            recursive_upload(server, lpath, rpath, preserve_mtime)
+            recursive_upload(server, lpath, rpath)
         else:
-            server.put(lpath, rpath, preserve_mtime=preserve_mtime)
+            server.put(lpath, rpath)
 
 def recursive_remove(server, rpath):
     file_list = server.listdir(rpath)
@@ -30,3 +30,29 @@ def recursive_remove(server, rpath):
             recursive_remove(server, current_path)
 
     server.rmdir(rpath)
+
+def main():
+    cnopts = pysftp.CnOpts()
+    cnopts.hostkeys = None
+    srv = pysftp.Connection(host=HOSTNAME, username=USERNAME, password=DRIFT_KEY, log="pysftp.log", cnopts=cnopts)
+
+    new_folder = "tiles" + str(random.randrange(1,100))
+    srv.mkdir(new_folder, mode=774)
+
+    with srv.cd(new_folder):
+        current_dir = srv.pwd
+        #print(srv.pwd)
+        local_dir = LOCAL_DIR
+        recursive_upload(srv, local_dir, current_dir) 
+
+    old_tiles = "tiles"
+    with srv.cd(old_tiles):
+        current_dir = srv.pwd
+        #print(current_dir)
+        recursive_remove(srv, current_dir)
+
+    current_dir = srv.pwd
+    srv.close()
+
+if __name__ == '__main__':
+    main()
