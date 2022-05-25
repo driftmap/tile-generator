@@ -39,15 +39,17 @@ def upload_all(HOSTNAME, USERNAME, DRIFT_KEY, LOCAL_DIR):
 
     with srv.cd(new_folder):
         current_dir = srv.pwd
-        #print(srv.pwd)
+        print(srv.pwd)
         local_dir = LOCAL_DIR
         recursive_upload(srv, local_dir, current_dir) 
 
     old_tiles = "tiles"
     with srv.cd(old_tiles):
         current_dir = srv.pwd
-        #print(current_dir)
+        print(current_dir)
         recursive_remove(srv, current_dir)
+
+    srv.rename(new_folder, "tiles")
 
     current_dir = srv.pwd
     srv.close()
