@@ -2,6 +2,7 @@ from dotenv import load_dotenv
 from src.tile_server_iterator import TileServerIterator
 from src.tile_tree_generator import TileTreeGenerator
 
+import upload_tool
 import click
 import os
 
@@ -50,8 +51,18 @@ def itertileserver(city_key:str, region:str, check_tiles:bool) -> None:
     tsi = TileServerIterator(OMT,city_key,filename,outpath,check_tiles)
     tsi.get_tiles_from_server()
 
+@click.command()
+def uploadall() -> None:
+    click.echo("Uploading all tiles")
+    HOSTNAME = os.environ.get("HOSTNAME")
+    USERNAME = os.environ.get("USERNAME")
+    DRIFT_KEY = os.environ.get("DRIFT_KEY")
+    LOCAL_DIR = os.environ.get("LOCAL_DIR")
+    upload_tool.upload_all(HOSTNAME, USERNAME, DRIFT_KEY, LOCAL_DIR)
+
 main.add_command(gentiletrees)
 main.add_command(itertileserver)
+main.add_command(uploadall)
 
 if __name__ == '__main__':
     main()
