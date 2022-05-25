@@ -9,25 +9,6 @@ import os
 import requests
 import time
 
-
-"""
-TODO:
-Create function which takes a CSV of city_keys and maps generate_tiles to each city for mass dling
-"""
-
-"""
-Timing Improvement Notes:
-Original Fetch Time:
-Fetching tiles for atlanta took 335.68190026283264  sec to run
-Fetching tiles for atlanta took 352.68857431411743  sec to run
-Cleaned up Fetch time after threaded:
-54.5 seconds
-69 seconds
-61 seconds
-54 seconds
-52 seconds
-"""
-
 class TileServerIterator():
     def __init__(self, OMT:str, city_key:str, filename:str, outpath:str, check_if_tile_exists:bool) -> None:
         self.OMT = OMT
