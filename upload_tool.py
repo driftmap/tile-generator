@@ -2,9 +2,7 @@ import pysftp
 import random
 import os
 
-load_dotenv()
-
-def recursive_upload(server, local, remote):
+def recursive_upload(server, local, remote) -> None:
     for name in os.listdir(local):
         rpath = remote + "/" + name
         lpath = os.path.join(local, name)
@@ -19,7 +17,7 @@ def recursive_upload(server, local, remote):
         else:
             server.put(lpath, rpath)
 
-def recursive_remove(server, rpath):
+def recursive_remove(server, rpath) -> None:
     file_list = server.listdir(rpath)
     for name in file_list:
         current_path = os.path.join(rpath, name)
@@ -31,7 +29,7 @@ def recursive_remove(server, rpath):
 
     server.rmdir(rpath)
 
-def main():
+def upload_all(HOSTNAME, USERNAME, DRIFT_KEY, LOCAL_DIR):
     cnopts = pysftp.CnOpts()
     cnopts.hostkeys = None
     srv = pysftp.Connection(host=HOSTNAME, username=USERNAME, password=DRIFT_KEY, log="pysftp.log", cnopts=cnopts)
@@ -53,6 +51,3 @@ def main():
 
     current_dir = srv.pwd
     srv.close()
-
-if __name__ == '__main__':
-    main()
