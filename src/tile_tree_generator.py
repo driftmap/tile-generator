@@ -25,6 +25,7 @@ class TileTreeGenerator():
         tile_tree, tile_diagnostics = self._iter_tiles()
         print("Total tile counts by city:")
         print(dict(sorted(tile_diagnostics.items(), key=lambda item: item[1])))
+        print(tile_tree)
         json.dump(tile_tree, open(f'{self.outpath}_tile_tree.json', 'w'), indent=4,  sort_keys=True)
 
     def _read_beta_census(self) -> List[Tuple[str,str,Tuple[float,float,float,float]]]:

@@ -33,10 +33,8 @@ def main() -> None:
 @click.option("--data-path", default='data/cities/', help="Folder from which to read and write data.")
 def gentiletrees(region:str, top_n:int, z_low:int, z_high:int, data_path:str) -> None:
     click.echo(f'Launching geocoder for region "{region}", with top {top_n} cities and zoom range {z_low}-{z_high}.')
-    API_KEY = os.environ.get("GOOGLE_MAPS_KEY")
-    filename = f'{data_path}{region}cities.csv'
     outpath = f'{data_path}{region}'
-    ttg = TileTreeGenerator(API_KEY, region, filename, z_low, z_high, top_n, outpath)
+    ttg = TileTreeGenerator(API_KEY, region, z_low, z_high, top_n, outpath)
     ttg.generate_tile_trees_from_shapefiles()
 
 @click.command()
