@@ -1,4 +1,5 @@
 from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime
 from dotenv import load_dotenv
 from mercantile import tiles, Tile
 from typing import Dict, List, Tuple
@@ -11,10 +12,8 @@ import os
 import pickle
 
 class TileTreeGenerator():
-    def __init__(self, API_KEY:str, region:str, file:str, z_low:int, z_high:int, top_n:int, outpath:str) -> None:
-        self.API_KEY = API_KEY
+    def __init__(self, region:str, z_low:int, z_high:int, top_n:int, outpath:str) -> None:
         self.region = region
-        self.file = file
         self.rng = range(z_low, z_high)
         self.top_n = top_n
         self.outpath = outpath
@@ -22,11 +21,14 @@ class TileTreeGenerator():
     def generate_tile_trees_from_shapefiles(self) -> None:
         queries = self._read_census()
         self._process_queries(queries)
-        tile_tree, tile_diagnostics = self._iter_tiles()
+        tile_tree, tile_diagnostics, client_config = self._iter_tiles()
         print("Total tile counts by city:")
         print(dict(sorted(tile_diagnostics.items(), key=lambda item: item[1])))
-        print(tile_tree)
-        json.dump(tile_tree, open(f'{self.outpath}_tile_tree.json', 'w'), indent=4,  sort_keys=True)
+        print(tile_tree.keys())
+        json.dump(tile_tree, open(f'{self.outpath}_tile_tree.json', 'w'), indent=4,  
+        sort_keys=True)
+        json.dump(client_config, open('data/tiles/config.json', 'w'), indent=4,  
+        sort_keys=True)
 
     def _read_beta_census(self) -> List[Tuple[str,str,Tuple[float,float,float,float]]]:
         queries = []
@@ -106,7 +108,8 @@ class TileTreeGenerator():
         tile_tree[k]['_name'] = self.city_tile_pairs[k]['_name']
         tile_tree[k]['_centroid'] = self.city_tile_pairs[k]['_centroid']
         tile_tree[k]['_bbox'] = self.city_tile_pairs[k]['_bbox']
-        tile_tree[k]['_key'] = self.city_tile_pairs[k]['_bbox']
+        tile_tree[k]['_key'] = self.city_tile_pairs[k]['_key']
+        tile_tree[k]['_updated'] = datetime.now().strftime("%Y_%m_%d-%I:%M:%S_%p")
         tile_tree[k]['tiles'] = {}
         return tile_tree
 
@@ -121,6 +124,7 @@ class TileTreeGenerator():
     def _iter_tiles(self) -> Dict[str,Dict]:
         tile_diagnostics = {}
         tile_tree = {}
+        client_config = {}
         for k in self.city_tile_pairs.keys():
             tiles = self.city_tile_pairs[k]['tile_gen']
             tile_tree = self._expand_tile_tree(tile_tree, k)
@@ -131,8 +135,11 @@ class TileTreeGenerator():
             if tile_counter > 1000:
                 print(f"Finished generating tiles for {tile_tree[k]['_name']} with {tile_counter} tiles.")
             tile_tree[k]['_nr_tiles'] = tile_counter
+            tile_tree[k]['_city_config'] = f"data/tiles/{tile_tree[k]['_key']}/config.json"
+            client_config[k] = dict(tile_tree[k])
+            del client_config[k]['tiles']
             tile_diagnostics[k] = tile_counter
-        return tile_tree, tile_diagnostics
+        return tile_tree, tile_diagnostics, client_config
 
     def _create_census_key(self, name:str) -> str:
         census_key = name.replace(", ", "_").lower()
