@@ -10,14 +10,11 @@
             -84.3657415,
             33.779034
         ],
-        "_key": [
-            -85.05069,
-            33.172088,
-            -83.680793,
-            34.38598
-        ],
+        "_city_config": "data/tiles/atlanta_ga/config.json",
+        "_key": "atlanta_ga",
         "_name": "Atlanta, GA",
         "_nr_tiles": 5801,
+        "_updated": "2022_05_25-10:38:55_PM",
         "tiles": {
             "5": [
                 [
@@ -23256,14 +23253,11 @@
             -118.179007,
             33.9509775
         ],
-        "_key": [
-            -118.871573,
-            33.564041,
-            -117.486441,
-            34.337914
-        ],
+        "_city_config": "data/tiles/losangeles_ca/config.json",
+        "_key": "losangeles_ca",
         "_name": "Los Angeles, CA",
         "_nr_tiles": 3763,
+        "_updated": "2022_05_25-10:38:55_PM",
         "tiles": {
             "5": [
                 [
@@ -38350,14 +38344,11 @@
             -73.72826520392081,
             45.584043985983
         ],
-        "_key": [
-            -74.3279691017308,
-            45.19959833324911,
-            -73.12856130611083,
-            45.9684896387169
-        ],
+        "_city_config": "data/tiles/montreal_qc/config.json",
+        "_key": "montreal_qc",
         "_name": "Montreal, QC",
         "_nr_tiles": 3809,
+        "_updated": "2022_05_25-10:38:55_PM",
         "tiles": {
             "5": [
                 [
@@ -53628,14 +53619,11 @@
             -73.97780021351167,
             40.70583338205725
         ],
-        "_key": [
-            -74.25559136315213,
-            40.496133987611834,
-            -73.7000090638712,
-            40.91553277650267
-        ],
+        "_city_config": "data/tiles/newyorkcity_ny/config.json",
+        "_key": "newyorkcity_ny",
         "_name": "New York City, NY",
         "_nr_tiles": 968,
+        "_updated": "2022_05_25-10:38:55_PM",
         "tiles": {
             "5": [
                 [

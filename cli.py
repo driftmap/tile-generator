@@ -8,13 +8,6 @@ import os
 
 load_dotenv()
 
-"""
-TODO:
-- Add arguments for filename & outpath, etc
-- Add help
-
-"""
-
 city_key_help = """
 City key to generate tiles for. Write city in lower case and connect with identifier using underscore.\n
 For US cities, identifier is county FIPS number. For example, atlanta_ga.\n
@@ -34,7 +27,8 @@ def main() -> None:
 def gentiletrees(region:str, top_n:int, z_low:int, z_high:int, data_path:str) -> None:
     click.echo(f'Launching geocoder for region "{region}", with top {top_n} cities and zoom range {z_low}-{z_high}.')
     outpath = f'{data_path}{region}'
-    ttg = TileTreeGenerator(API_KEY, region, z_low, z_high, top_n, outpath)
+    print([region, z_low, z_high, top_n, outpath])
+    ttg = TileTreeGenerator(region, z_low, z_high, top_n, outpath)
     ttg.generate_tile_trees_from_shapefiles()
 
 @click.command()
