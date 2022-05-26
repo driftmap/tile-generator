@@ -1,30 +1,35 @@
 # tile-generator
 
-CLI tool for:
+This is a command line tool for querying a tileserver and getting a static dump of tile files within a given geometry. The code here can be used to
 
-1. extracting city geometries from shapefiles,
-2. determining the bbox for each geometry,
-3. determining the tiles necessary to span their bbox at different zoom levels, and
-4. querying the tiles from an OpenMapTiles server to generate a folder tree with the tiles organized by zoom level.
+1. extract and merge city geometries from shapefiles,
+2. determine the bbox for each geometry,
+3. determine the tiles necessary to span their bbox at different zoom levels, and
+4. query the tiles from an OpenMapTiles server to generate a folder tree with the tiles organized by zoom level.
+5. push the tiles to a dev server
 
-Current CLI commands:
+The repo is part of a project to build an end-to-end encrypted [mapping app](https://github.com/driftmap). In the beta stage, the app will include four cities. For this app, the above steps are executed with the following steps:
 
-1. Geocoding:
-
-Mandatory --region flag, with "us" and "can" as options.
+## 1. Extract and merge city geometries:
 
 ```bash
-python cli.py gentiletree --region us
+python src/beta_data_merger.py
 ```
 
-2. Generate tiles:
+## 2. & 3. Determine bbox for city geometries and bbox to span them
 
 ```bash
-python cli.py gentiles --region us
+python cli.py gentiletrees --region beta
 ```
 
-For more command flags, type:
+## 4.  Query OMT server for tiles
 
 ```bash
-python cli.py [COMMAND] --help
+python cli.py itertileserver --region beta --city_key atlanta_ga
+```
+
+## 5. Push tiles to dev server
+
+```bash
+python cli.py uploadall
 ```
