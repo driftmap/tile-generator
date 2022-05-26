@@ -10,16 +10,12 @@
         -118.179007,
         33.9509775
     ],
-    "_key": [
-        -118.871573,
-        33.564041,
-        -117.486441,
-        34.337914
-    ],
+    "_city_config": "data/tiles/losangeles_ca/config.json",
+    "_key": "losangeles_ca",
     "_name": "Los Angeles, CA",
     "_nr_tiles": 3763,
     "_total_tile_size": 183628302,
-    "_updated": "2022_05_24-02:22:18_PM",
+    "_updated": "2022_05_25-10:47:54_PM",
     "tiles": {
         "10": [
             [

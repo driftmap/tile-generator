@@ -1,5 +1,5 @@
 {
-    "_avg_tile_size": 0.0,
+    "_avg_tile_size": 14885.46336838476,
     "_bbox": [
         -85.05069,
         33.172088,
@@ -10,15 +10,12 @@
         -84.3657415,
         33.779034
     ],
-    "_key": [
-        -85.05069,
-        33.172088,
-        -83.680793,
-        34.38598
-    ],
+    "_city_config": "data/tiles/atlanta_ga/config.json",
+    "_key": "atlanta_ga",
     "_name": "Atlanta, GA",
     "_nr_tiles": 5801,
-    "_total_tile_size": 0,
+    "_total_tile_size": 86350573,
+    "_updated": "2022_05_25-10:40:45_PM",
     "tiles": {
         "10": [
             [

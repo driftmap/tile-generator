@@ -10,16 +10,12 @@
         -73.97780021351167,
         40.70583338205725
     ],
-    "_key": [
-        -74.25559136315213,
-        40.496133987611834,
-        -73.7000090638712,
-        40.91553277650267
-    ],
+    "_city_config": "data/tiles/newyorkcity_ny/config.json",
+    "_key": "newyorkcity_ny",
     "_name": "New York City, NY",
     "_nr_tiles": 968,
     "_total_tile_size": 88933903,
-    "_updated": "2022_05_24-02:19:54_PM",
+    "_updated": "2022_05_25-10:48:31_PM",
     "tiles": {
         "10": [
             [
