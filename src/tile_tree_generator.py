@@ -100,7 +100,8 @@ class TileTreeGenerator():
         self.city_tile_pairs[key]['_key'] = key
         self.city_tile_pairs[key]['_name'] = name
         self.city_tile_pairs[key]['tile_gen'] = tile_generator
-        self.city_tile_pairs[key]['_centroid'] = ((bounds[0]+bounds[2])/2, (bounds[1]+bounds[3])/2)
+        self.city_tile_pairs[key]['_centroid'] = ((bounds[0]+bounds[2])/2, 
+                                                  (bounds[1]+bounds[3])/2)
         self.city_tile_pairs[key]['_bbox'] = bounds
 
     def _expand_tile_tree(self, tile_tree:Dict, k:str) -> Dict[str,Dict]:
@@ -135,7 +136,7 @@ class TileTreeGenerator():
             if tile_counter > 1000:
                 print(f"Finished generating tiles for {tile_tree[k]['_name']} with {tile_counter} tiles.")
             tile_tree[k]['_nr_tiles'] = tile_counter
-            tile_tree[k]['_city_config'] = f"data/tiles/{tile_tree[k]['_key']}/config.json"
+            tile_tree[k]['_city_config'] = f"tiles/{tile_tree[k]['_key']}/config.json"
             client_config[k] = dict(tile_tree[k])
             del client_config[k]['tiles']
             tile_diagnostics[k] = tile_counter
